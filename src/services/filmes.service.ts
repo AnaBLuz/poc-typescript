@@ -1,37 +1,30 @@
-import { FullRelation, RequestLista, ServerResponse } from "../protocols/index";
+import { RequestLista} from "../protocols/index";
+import filmesRepository from "../repositories/filmes.repository"
 import * as errors from "../errors/errorrs"
-import db from "../database/database.connection"
 
 
-async function listFilmes() {
-    
+
+async function listFilmes() {   
     const filmes = await filmesRepository.listFilmes();
     return filmes.rows;
 }
 
 async function createFilme(nome: string,plataforma: string ,gênero: string ,status: string) {
-    //1st rule => Game cannot be created if the platform doesn't exist
-    const plataformaExiste = await filmesRepository.listPlataforma(plataforma);
-    if (!plataformaExiste.rowCount) throw errors.notFoundError("filme");
-    const authorId: number = plataformaExiste.rows[0].id;
-
-    //2nd rule => Only one game per platform can exist
-    const filmeGeneroRelation = await filmesRepository.listFilmes(nome, gênero);
-    if (filmeGeneroRelation.rowCount)
-        throw errors.conflictError("genero");
+    await filmesRepository.createFilme(nome,plataforma,gênero,status);
 
 }
 
-async function deleteFilmeRelation(id: number) {
-    const relationExists: ServerResponse = await filmesRepository.findRelation(id);
-    if (!relationExists.rowCount) throw errors.notFoundError("Relation");
+async function updateStatus(id:number,status:string){
+    await filmesRepository.updateStatus(id,status);
+}
 
-    await filmesRepository.deleteRelation(id);
+async function deleteFilme(id: number){
+    const filmeExiste = await filmesRepository.findFilmeById(id);
+    if(!filmeExiste.rowCount) throw errors.notFoundError("Filme");
+    await filmesRepository.deleteFilme(id);
 }
 
 
-
-
-const filmesService = { listFilmes,createFilme,deleteFilmeRelation }
+const filmesService = { listFilmes, createFilme,updateStatus,deleteFilme}
 
 export default filmesService

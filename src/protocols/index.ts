@@ -13,15 +13,6 @@ export type RequestLista = {
 
 export type filme = Omit<RequestLista, "id">;
 
-export type FullRelation = {
-    id: number;
-    book_id: number;
-    author_id: number;
-    book: string;
-    author: string;
-  };
-
-  export type ServerResponse = {
-    rows: RequestLista[];
-    rowCount: number;
-};
+export type status = {
+    status: string;
+}
